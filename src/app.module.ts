@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 import { ClothingItem } from './clothing-items/entities/clothing-item.entity';
+import { FileUploadModule } from './file-upload/file-upload.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { ClothingItem } from './clothing-items/entities/clothing-item.entity';
       },
     }),
     ClothingItemsModule,
+    FileUploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

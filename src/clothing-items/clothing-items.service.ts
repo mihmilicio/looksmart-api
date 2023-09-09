@@ -3,18 +3,27 @@ import { UpdateClothingItemDto } from './dto/update-clothing-item.dto';
 import { ClothingItem } from './entities/clothing-item.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { FileUploadService } from 'src/file-upload/file-upload.service';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class ClothingItemsService {
   constructor(
     @InjectRepository(ClothingItem)
     private clothingItemsRepository: Repository<ClothingItem>,
+    private readonly fileUploadService: FileUploadService,
   ) {}
 
-  create(image: Express.Multer.File): Promise<ClothingItem> {
-    // TODO upload
+  async create(image: Express.Multer.File): Promise<ClothingItem> {
+    const id = uuid();
+    const ext = image.originalname.split('.').pop();
+    const filename = `clothing-items/${id}.${ext}`;
+
+    await this.fileUploadService.uploadFile(image.buffer, filename);
+
     return this.clothingItemsRepository.save({
-      image: image.buffer.toString(),
+      id,
+      image: filename,
     });
   }
 
