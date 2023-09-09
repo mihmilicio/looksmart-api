@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CreateClothingItemDto } from './dto/create-clothing-item.dto';
 import { UpdateClothingItemDto } from './dto/update-clothing-item.dto';
 import { ClothingItem } from './entities/clothing-item.entity';
 import { Repository } from 'typeorm';
@@ -12,8 +11,11 @@ export class ClothingItemsService {
     private clothingItemsRepository: Repository<ClothingItem>,
   ) {}
 
-  create(createClothingItemDto: CreateClothingItemDto): Promise<ClothingItem> {
-    return this.clothingItemsRepository.save(createClothingItemDto);
+  create(image: Express.Multer.File): Promise<ClothingItem> {
+    // TODO upload
+    return this.clothingItemsRepository.save({
+      image: image.buffer.toString(),
+    });
   }
 
   findAll(): Promise<ClothingItem[]> {
