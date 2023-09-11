@@ -23,7 +23,7 @@ export class ClothingItemsService {
 
     return this.clothingItemsRepository.save({
       id,
-      image: filename,
+      image: process.env.STORAGE_URL + filename,
     });
   }
 
@@ -38,12 +38,13 @@ export class ClothingItemsService {
   async update(
     id: string,
     updateClothingItemDto: UpdateClothingItemDto,
-  ): Promise<void> {
+  ): Promise<ClothingItem> {
     const clothingItem = new ClothingItem();
     clothingItem.season = updateClothingItemDto.season;
     clothingItem.type = updateClothingItemDto.type;
     clothingItem.usage = updateClothingItemDto.usage;
     await this.clothingItemsRepository.update({ id }, clothingItem);
+    return this.clothingItemsRepository.findOneBy({ id });
   }
 
   async remove(id: string): Promise<void> {
