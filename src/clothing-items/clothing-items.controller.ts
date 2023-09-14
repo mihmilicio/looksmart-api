@@ -11,17 +11,47 @@ import {
   HttpException,
   HttpStatus,
   NotFoundException,
+  HttpCode,
 } from '@nestjs/common';
 import { ClothingItemsService } from './clothing-items.service';
 import { UpdateClothingItemDto } from './dto/update-clothing-item.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiTags,
+  ApiUnprocessableEntityResponse,
+} from '@nestjs/swagger';
+import { DefaultExceptionDto } from 'src/exceptions/default-exception.dto';
 
+@ApiTags('clothing-items')
 @Controller('clothing-items')
 export class ClothingItemsController {
   constructor(private readonly clothingItemsService: ClothingItemsService) {}
 
   @Post()
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        image: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @ApiUnprocessableEntityResponse({
+    type: DefaultExceptionDto,
+    description: 'Clothing item not recognized in the image',
+  })
+  @ApiInternalServerErrorResponse({
+    type: DefaultExceptionDto,
+  })
   @UseInterceptors(FileInterceptor('image'))
   create(@UploadedFile() image: Express.Multer.File) {
     try {
@@ -43,6 +73,9 @@ export class ClothingItemsController {
   }
 
   @Get()
+  @ApiInternalServerErrorResponse({
+    type: DefaultExceptionDto,
+  })
   findAll() {
     try {
       return this.clothingItemsService.findAll();
@@ -56,16 +89,20 @@ export class ClothingItemsController {
   }
 
   @Get(':id')
+  @ApiNotFoundResponse({
+    type: DefaultExceptionDto,
+  })
+  @ApiInternalServerErrorResponse({
+    type: DefaultExceptionDto,
+  })
   async findOne(@Param('id') id: string) {
     try {
       const clothingItem = await this.clothingItemsService.findOne(id);
 
       if (clothingItem) {
-        console.log(clothingItem);
         return clothingItem;
       }
 
-      console.log('404');
       throw new NotFoundException('Não encontramos essa peça de roupa...');
     } catch (err) {
       console.error(err);
@@ -81,6 +118,12 @@ export class ClothingItemsController {
   }
 
   @Put(':id')
+  @ApiNotFoundResponse({
+    type: DefaultExceptionDto,
+  })
+  @ApiInternalServerErrorResponse({
+    type: DefaultExceptionDto,
+  })
   async update(
     @Param('id') id: string,
     @Body() updateClothingItemDto: UpdateClothingItemDto,
@@ -103,6 +146,13 @@ export class ClothingItemsController {
   }
 
   @Delete(':id')
+  @HttpCode(204)
+  @ApiNotFoundResponse({
+    type: DefaultExceptionDto,
+  })
+  @ApiInternalServerErrorResponse({
+    type: DefaultExceptionDto,
+  })
   async remove(@Param('id') id: string) {
     try {
       if (await this.findOne(id)) {
