@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 import { ClothingItem } from './clothing-items/entities/clothing-item.entity';
 import { FileUploadModule } from './file-upload/file-upload.module';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { FileUploadModule } from './file-upload/file-upload.module';
     }),
     ClothingItemsModule,
     FileUploadModule,
+    AiModule,
   ],
   controllers: [AppController],
   providers: [AppService],

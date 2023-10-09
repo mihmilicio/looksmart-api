@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { v4 as uuid } from 'uuid';
+import { AiService } from 'src/ai/ai.service';
 
 @Injectable()
 export class ClothingItemsService {
@@ -12,6 +13,7 @@ export class ClothingItemsService {
     @InjectRepository(ClothingItem)
     private clothingItemsRepository: Repository<ClothingItem>,
     private readonly fileUploadService: FileUploadService,
+    private readonly aiService: AiService,
   ) {}
 
   async create(image: Express.Multer.File): Promise<ClothingItem> {
@@ -21,10 +23,20 @@ export class ClothingItemsService {
 
     await this.fileUploadService.uploadFile(image.buffer, filename);
 
-    return this.clothingItemsRepository.save({
+    const predicted = await this.aiService.classifyClothingItem(image);
+
+    const saved = await this.clothingItemsRepository.save({
       id,
       image: process.env.STORAGE_URL + filename,
     });
+
+    return {
+      id: saved.id,
+      image: saved.image,
+      type: predicted.type,
+      season: predicted.season,
+      usage: predicted.usage,
+    };
   }
 
   findAll(): Promise<ClothingItem[]> {

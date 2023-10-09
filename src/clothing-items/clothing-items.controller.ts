@@ -26,6 +26,7 @@ import {
   ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import { DefaultExceptionDto } from 'src/exceptions/default-exception.dto';
+import { AxiosError } from 'axios';
 
 @ApiTags('clothing-items')
 @Controller('clothing-items')
@@ -63,12 +64,19 @@ export class ClothingItemsController {
           'Não foi possível fazer o upload da imagem',
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
-      } else {
+      }
+
+      if (err instanceof AxiosError) {
         throw new HttpException(
-          'Algo de errado aconteceu. Tente novamente',
-          HttpStatus.INTERNAL_SERVER_ERROR,
+          'Erro ao classificar a classificar a peça',
+          HttpStatus.SERVICE_UNAVAILABLE,
         );
       }
+
+      throw new HttpException(
+        'Algo de errado aconteceu. Tente novamente',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
