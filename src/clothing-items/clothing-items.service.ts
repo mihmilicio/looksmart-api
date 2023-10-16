@@ -19,15 +19,18 @@ export class ClothingItemsService {
   async create(image: Express.Multer.File): Promise<ClothingItem> {
     const id = uuid();
     const ext = image.originalname.split('.').pop();
-    const filename = `clothing-items/${id}.${ext}`;
+    const filename = `${id}.${ext}`;
 
-    await this.fileUploadService.uploadFile(image.buffer, filename);
+    await this.fileUploadService.uploadFile(
+      image.buffer,
+      `${process.env.IMAGES_DIR}/${filename}`,
+    );
 
-    const predicted = await this.aiService.classifyClothingItem(image);
+    const predicted = await this.aiService.classifyClothingItem(filename);
 
     const saved = await this.clothingItemsRepository.save({
       id,
-      image: process.env.STORAGE_URL + filename,
+      image: `${process.env.STORAGE_URL}${process.env.IMAGES_NO_BG_DIR}/${filename}`,
     });
 
     return {

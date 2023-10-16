@@ -8,16 +8,10 @@ export class AiService {
   constructor(private readonly httpService: HttpService) {}
 
   async classifyClothingItem(
-    image: Express.Multer.File,
+    filename: string,
   ): Promise<ClothingItemClassificationDto> {
-    const { data } = await firstValueFrom(
-      this.httpService.post(
-        `${process.env.IA_BASE_URL}/api/Classify`,
-        image.buffer,
-        { headers: { 'Content-Type': image.mimetype } },
-      ),
-    );
-
+    const url = `${process.env.IA_BASE_URL}/classify?filename=${filename}`;
+    const { data } = await firstValueFrom(this.httpService.get(url));
     return data;
   }
 }
