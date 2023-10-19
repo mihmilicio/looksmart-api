@@ -10,6 +10,7 @@ import {
   ClothingItemCategoryEnum,
   clothingItemsInCategory,
 } from './clothing-item-category.enum';
+import { ClothingItemClassificationDto } from 'src/ai/dto/clothing-item-classification.dto';
 
 @Injectable()
 export class ClothingItemsService {
@@ -30,19 +31,28 @@ export class ClothingItemsService {
       `${process.env.IMAGES_DIR}/${filename}`,
     );
 
-    const predicted = await this.aiService.classifyClothingItem(filename);
+    const skipAI = process.env.SKIP_AI_SERVICE === 'true';
+
+    let predicted: ClothingItemClassificationDto;
+    if (!skipAI) {
+      predicted = await this.aiService.classifyClothingItem(filename);
+    }
 
     const saved = await this.clothingItemsRepository.save({
       id,
-      image: `${process.env.STORAGE_URL}${process.env.IMAGES_NO_BG_DIR}/${filename}`,
+      image: `${process.env.STORAGE_URL}${
+        skipAI ? process.env.IMAGES_DIR : process.env.IMAGES_NO_BG_DIR
+      }/${filename}`,
+      description: skipAI ? 'Não identificado' : predicted.description,
     });
 
     return {
       id: saved.id,
       image: saved.image,
-      type: predicted.type,
-      season: predicted.season,
-      usage: predicted.usage,
+      type: skipAI ? 'cima' : predicted.type,
+      season: skipAI ? 'meia-estacao' : predicted.season,
+      usage: skipAI ? 'casual' : predicted.usage,
+      description: saved.description,
     };
   }
 
