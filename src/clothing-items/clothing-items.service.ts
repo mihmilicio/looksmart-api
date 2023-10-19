@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { v4 as uuid } from 'uuid';
 import { AiService } from 'src/ai/ai.service';
+import { ClothingItemClassificationDto } from 'src/ai/dto/clothing-item-classification.dto';
 
 @Injectable()
 export class ClothingItemsService {
@@ -26,19 +27,26 @@ export class ClothingItemsService {
       `${process.env.IMAGES_DIR}/${filename}`,
     );
 
-    const predicted = await this.aiService.classifyClothingItem(filename);
+    const skipAI = process.env.SKIP_AI_SERVICE === 'true';
+
+    let predicted: ClothingItemClassificationDto;
+    if (!skipAI) {
+      predicted = await this.aiService.classifyClothingItem(filename);
+    }
 
     const saved = await this.clothingItemsRepository.save({
       id,
-      image: `${process.env.STORAGE_URL}${process.env.IMAGES_NO_BG_DIR}/${filename}`,
+      image: `${process.env.STORAGE_URL}${
+        skipAI ? process.env.IMAGES_DIR : process.env.IMAGES_NO_BG_DIR
+      }/${filename}`,
     });
 
     return {
       id: saved.id,
       image: saved.image,
-      type: predicted.type,
-      season: predicted.season,
-      usage: predicted.usage,
+      type: skipAI ? 'top' : predicted.type,
+      season: skipAI ? 'meia-estacao' : predicted.season,
+      usage: skipAI ? 'universal' : predicted.usage,
     };
   }
 
