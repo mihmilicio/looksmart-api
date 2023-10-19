@@ -8,6 +8,7 @@ import { DataSource } from 'typeorm';
 import { ClothingItem } from './clothing-items/entities/clothing-item.entity';
 import { FileUploadModule } from './file-upload/file-upload.module';
 import { AiModule } from './ai/ai.module';
+import { LookModule } from './look/look.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AiModule } from './ai/ai.module';
       entities: [ClothingItem],
       synchronize: true,
       ssl: true,
+      logging: true,
       extra: {
         ssl: {
           rejectUnauthorized: false,
@@ -31,6 +33,7 @@ import { AiModule } from './ai/ai.module';
     ClothingItemsModule,
     FileUploadModule,
     AiModule,
+    LookModule,
   ],
   controllers: [AppController],
   providers: [AppService],

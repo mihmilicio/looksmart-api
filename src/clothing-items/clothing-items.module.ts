@@ -14,5 +14,6 @@ import { AiModule } from 'src/ai/ai.module';
   ],
   controllers: [ClothingItemsController],
   providers: [ClothingItemsService],
+  exports: [ClothingItemsService],
 })
 export class ClothingItemsModule {}

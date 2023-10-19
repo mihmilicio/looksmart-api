@@ -6,6 +6,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { v4 as uuid } from 'uuid';
 import { AiService } from 'src/ai/ai.service';
+import {
+  ClothingItemCategoryEnum,
+  clothingItemsInCategory,
+} from './clothing-item-category.enum';
 
 @Injectable()
 export class ClothingItemsService {
@@ -64,5 +68,29 @@ export class ClothingItemsService {
 
   async remove(id: string): Promise<void> {
     await this.clothingItemsRepository.delete(id);
+  }
+
+  chooseOneInCategory(
+    category: ClothingItemCategoryEnum,
+  ): Promise<ClothingItem | null> {
+    const typesInCategory = clothingItemsInCategory(category);
+
+    this.clothingItemsRepository
+      .createQueryBuilder('clothing-item')
+      .select()
+      .where(`clothing-item.type in (${typesInCategory.join(',')})`)
+      .orderBy('RANDOM()')
+      .printSql();
+
+    return this.clothingItemsRepository
+      .createQueryBuilder('clothing-item')
+      .select()
+      .where(
+        `clothing-item.type in (${typesInCategory
+          .map((type) => `'${type}'`)
+          .join(',')})`,
+      )
+      .orderBy('RANDOM()')
+      .getOne();
   }
 }
