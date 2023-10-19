@@ -3,4 +3,5 @@ export class ClothingItemClassificationDto {
   usage: string;
   season: string;
   percentage: number;
+  description: string;
 }

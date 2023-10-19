@@ -14,6 +14,9 @@ export class ClothingItem {
   @Column({ nullable: true })
   season?: string;
 
+  @Column({ nullable: true })
+  description?: string;
+
   @Column()
   image: string;
 }

@@ -39,14 +39,16 @@ export class ClothingItemsService {
       image: `${process.env.STORAGE_URL}${
         skipAI ? process.env.IMAGES_DIR : process.env.IMAGES_NO_BG_DIR
       }/${filename}`,
+      description: skipAI ? 'Não identificado' : predicted.description,
     });
 
     return {
       id: saved.id,
       image: saved.image,
-      type: skipAI ? 'top' : predicted.type,
+      type: skipAI ? 'cima' : predicted.type,
       season: skipAI ? 'meia-estacao' : predicted.season,
-      usage: skipAI ? 'universal' : predicted.usage,
+      usage: skipAI ? 'casual' : predicted.usage,
+      description: saved.description,
     };
   }
 
