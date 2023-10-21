@@ -7,27 +7,51 @@ import { ClothingItemCategoryEnum } from 'src/clothing-items/clothing-item-categ
 export class LookService {
   constructor(private readonly clothingItemsService: ClothingItemsService) {}
 
-  async generate(usage: string, season: string): Promise<LookDto> {
-    const promiseTop = this.clothingItemsService.chooseOneInCategory(
-      ClothingItemCategoryEnum.Top,
-    );
-    const promiseBottom = this.clothingItemsService.chooseOneInCategory(
-      ClothingItemCategoryEnum.Bottom,
-    );
-    const promiseFootwear = this.clothingItemsService.chooseOneInCategory(
-      ClothingItemCategoryEnum.Footwear,
-    );
+  async generate(
+    usage: string,
+    season: string,
+    topId: string,
+    bottomId: string,
+    footwearId: string,
+  ): Promise<LookDto> {
+    const promiseTop = !!topId
+      ? this.clothingItemsService.findOne(topId)
+      : this.clothingItemsService.chooseOneInCategory(
+          ClothingItemCategoryEnum.Top,
+          usage,
+          season,
+        );
+    const promiseBottom = !!bottomId
+      ? this.clothingItemsService.findOne(bottomId)
+      : this.clothingItemsService.chooseOneInCategory(
+          ClothingItemCategoryEnum.Bottom,
+          usage,
+          season,
+        );
+    const promiseFootwear = !!footwearId
+      ? this.clothingItemsService.findOne(footwearId)
+      : this.clothingItemsService.chooseOneInCategory(
+          ClothingItemCategoryEnum.Footwear,
+          usage,
+          season,
+        );
 
-    const [top, bottom, footwear] = await Promise.all([
+    const pecas = await Promise.all([
       promiseTop,
       promiseBottom,
       promiseFootwear,
     ]);
 
+    const lowConfiability = pecas.some(
+      (peca) => peca.usage != usage || peca.season != season,
+    );
+
+    const [top, bottom, footwear] = pecas;
+
     return {
       usage,
       season,
-      lowConfiability: false,
+      lowConfiability,
       top,
       bottom,
       footwear,

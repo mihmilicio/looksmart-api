@@ -1,7 +1,7 @@
 export enum ClothingItemCategoryEnum {
-  Top,
-  Bottom,
-  Footwear,
+  Top = 'cima',
+  Bottom = 'baixo',
+  Footwear = 'calcado',
 }
 
 export const clothingItemsInCategory = (

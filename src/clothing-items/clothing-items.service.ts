@@ -6,10 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { v4 as uuid } from 'uuid';
 import { AiService } from 'src/ai/ai.service';
-import {
-  ClothingItemCategoryEnum,
-  clothingItemsInCategory,
-} from './clothing-item-category.enum';
+import { ClothingItemCategoryEnum } from './clothing-item-category.enum';
 import { ClothingItemClassificationDto } from 'src/ai/dto/clothing-item-classification.dto';
 
 @Injectable()
@@ -82,23 +79,24 @@ export class ClothingItemsService {
 
   chooseOneInCategory(
     category: ClothingItemCategoryEnum,
+    usage: string,
+    season: string,
   ): Promise<ClothingItem | null> {
-    const typesInCategory = clothingItemsInCategory(category);
-
-    this.clothingItemsRepository
-      .createQueryBuilder('clothing-item')
-      .select()
-      .where(`clothing-item.type in (${typesInCategory.join(',')})`)
-      .orderBy('RANDOM()')
-      .printSql();
-
     return this.clothingItemsRepository
       .createQueryBuilder('clothing-item')
-      .select()
+      .select([
+        'clothing-item.id',
+        'clothing-item.image',
+        'clothing-item.usage',
+        'clothing-item.season',
+      ])
       .where(
-        `clothing-item.type in (${typesInCategory
-          .map((type) => `'${type}'`)
-          .join(',')})`,
+        `(clothing-item.type = :type AND clothing-item.usage = :usage AND clothing-item.season = :season) OR (clothing-item.type = :type)`,
+        {
+          type: category,
+          usage,
+          season,
+        },
       )
       .orderBy('RANDOM()')
       .getOne();
