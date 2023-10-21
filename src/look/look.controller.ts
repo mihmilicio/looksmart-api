@@ -23,7 +23,14 @@ export class LookController {
     usage = usage || 'casual';
 
     try {
-      // TODO verificar se pode formar look
+      const lookAvailability = await this.lookService.checkLookAvailability();
+
+      if (!lookAvailability.available) {
+        throw new HttpException(
+          'Não existem peças para formar um look',
+          HttpStatus.FAILED_DEPENDENCY,
+        );
+      }
 
       const look = await this.lookService.generate(
         usage,
@@ -32,8 +39,6 @@ export class LookController {
         bottom,
         footwear,
       );
-
-      console.log(look);
 
       if (look.top == null || look.bottom == null || look.footwear == null) {
         throw new HttpException(
@@ -59,6 +64,19 @@ export class LookController {
         throw err;
       }
 
+      throw new HttpException(
+        'Algo de errado aconteceu. Tente novamente',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('availability')
+  async checkLookAvailability() {
+    try {
+      return this.lookService.checkLookAvailability();
+    } catch (err) {
+      console.log(err);
       throw new HttpException(
         'Algo de errado aconteceu. Tente novamente',
         HttpStatus.INTERNAL_SERVER_ERROR,

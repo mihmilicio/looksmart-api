@@ -101,4 +101,14 @@ export class ClothingItemsService {
       .orderBy('RANDOM()')
       .getOne();
   }
+
+  countItemsOfType(category: ClothingItemCategoryEnum): Promise<number> {
+    return this.clothingItemsRepository
+      .createQueryBuilder('clothing-item')
+      .select(['clothing-item.id'])
+      .where(`clothing-item.type = :type`, {
+        type: category,
+      })
+      .getCount();
+  }
 }
