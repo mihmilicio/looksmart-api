@@ -50,11 +50,15 @@ export class ClothingItemsService {
       season: skipAI ? 'meia-estacao' : predicted.season,
       usage: skipAI ? 'casual' : predicted.usage,
       description: saved.description,
+      createdDate: saved.createdDate,
+      updatedDate: saved.updatedDate,
     };
   }
 
   findAll(): Promise<ClothingItem[]> {
-    return this.clothingItemsRepository.find();
+    return this.clothingItemsRepository.find({
+      order: { createdDate: 'DESC' },
+    });
   }
 
   findOne(id: string): Promise<ClothingItem | null> {
