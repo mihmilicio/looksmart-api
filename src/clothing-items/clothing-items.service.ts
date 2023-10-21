@@ -69,6 +69,7 @@ export class ClothingItemsService {
     clothingItem.season = updateClothingItemDto.season;
     clothingItem.type = updateClothingItemDto.type;
     clothingItem.usage = updateClothingItemDto.usage;
+    clothingItem.description = updateClothingItemDto.description;
     await this.clothingItemsRepository.update({ id }, clothingItem);
     return this.clothingItemsRepository.findOneBy({ id });
   }
