@@ -81,6 +81,14 @@ export class ClothingItemsService {
   }
 
   async remove(id: string): Promise<void> {
+    try {
+      const clothingItem = await this.findOne(id);
+      await this.fileUploadService.deleteFile(clothingItem.image);
+    } catch (err) {
+      console.log(err);
+      console.log('Não foi possível deletar o arquivo');
+    }
+
     await this.clothingItemsRepository.delete(id);
   }
 
