@@ -35,11 +35,13 @@ export class ClothingItemsService {
       predicted = await this.aiService.classifyClothingItem(filename);
     }
 
+    const imagePath = skipAI
+      ? `${process.env.IMAGES_DIR}/${filename}`
+      : `${process.env.IMAGES_NO_BG_DIR}/${id}.png`;
+
     const saved = await this.clothingItemsRepository.save({
       id,
-      image: `${process.env.STORAGE_URL}${
-        skipAI ? process.env.IMAGES_DIR : process.env.IMAGES_NO_BG_DIR
-      }/${filename}`,
+      image: process.env.STORAGE_URL + imagePath,
       description: skipAI ? 'Não identificado' : predicted.description,
     });
 
