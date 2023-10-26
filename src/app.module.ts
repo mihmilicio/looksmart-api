@@ -9,6 +9,8 @@ import { ClothingItem } from './clothing-items/entities/clothing-item.entity';
 import { FileUploadModule } from './file-upload/file-upload.module';
 import { AiModule } from './ai/ai.module';
 import { LookModule } from './look/look.module';
+import { WeatherModule } from './weather/weather.module';
+import { LocationModule } from './location/location.module';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { LookModule } from './look/look.module';
     FileUploadModule,
     AiModule,
     LookModule,
+    WeatherModule,
+    LocationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
