@@ -46,11 +46,6 @@ export class Supabase {
       },
     );
 
-    // this.clientInstance.auth.setAuth(
-    //   ExtractJwt.fromAuthHeaderAsBearerToken()(this.request),
-    // );
-    // this.logger.log('auth has been set!');]
-
     return this.clientInstance;
   }
 }
