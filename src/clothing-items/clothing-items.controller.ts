@@ -12,6 +12,7 @@ import {
   HttpStatus,
   NotFoundException,
   HttpCode,
+  Request,
 } from '@nestjs/common';
 import { ClothingItemsService } from './clothing-items.service';
 import { UpdateClothingItemDto } from './dto/update-clothing-item.dto';
@@ -54,9 +55,9 @@ export class ClothingItemsController {
     type: DefaultExceptionDto,
   })
   @UseInterceptors(FileInterceptor('image'))
-  create(@UploadedFile() image: Express.Multer.File) {
+  create(@UploadedFile() image: Express.Multer.File, @Request() req) {
     try {
-      return this.clothingItemsService.create(image);
+      return this.clothingItemsService.create(image, req.user.userId);
     } catch (err) {
       console.error(err);
       if (err instanceof FileUploadFailedException) {
@@ -84,9 +85,9 @@ export class ClothingItemsController {
   @ApiInternalServerErrorResponse({
     type: DefaultExceptionDto,
   })
-  findAll() {
+  findAll(@Request() req) {
     try {
-      return this.clothingItemsService.findAll();
+      return this.clothingItemsService.findAll(req.user.userId);
     } catch (err) {
       console.error(err);
       throw new HttpException(
@@ -103,9 +104,12 @@ export class ClothingItemsController {
   @ApiInternalServerErrorResponse({
     type: DefaultExceptionDto,
   })
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string, @Request() req) {
     try {
-      const clothingItem = await this.clothingItemsService.findOne(id);
+      const clothingItem = await this.clothingItemsService.findOne(
+        id,
+        req.user.userId,
+      );
 
       if (clothingItem) {
         return clothingItem;
@@ -135,10 +139,14 @@ export class ClothingItemsController {
   async update(
     @Param('id') id: string,
     @Body() updateClothingItemDto: UpdateClothingItemDto,
+    @Request() req,
   ) {
     try {
-      if (await this.findOne(id)) {
-        return this.clothingItemsService.update(id, updateClothingItemDto);
+      if (await this.findOne(id, req)) {
+        return await this.clothingItemsService.update(
+          id,
+          updateClothingItemDto,
+        );
       }
     } catch (err) {
       console.error(err);
@@ -161,10 +169,10 @@ export class ClothingItemsController {
   @ApiInternalServerErrorResponse({
     type: DefaultExceptionDto,
   })
-  async remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string, @Request() req) {
     try {
-      if (await this.findOne(id)) {
-        return this.clothingItemsService.remove(id);
+      if (await this.findOne(id, req)) {
+        return await this.clothingItemsService.remove(id, req.user.userId);
       }
     } catch (err) {
       console.error(err);

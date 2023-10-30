@@ -9,6 +9,7 @@ import { ClothingItem } from './clothing-items/entities/clothing-item.entity';
 import { FileUploadModule } from './file-upload/file-upload.module';
 import { AiModule } from './ai/ai.module';
 import { LookModule } from './look/look.module';
+import { AuthModule } from './auth/auth.module';
 import { WeatherModule } from './weather/weather.module';
 import { LocationModule } from './location/location.module';
 
@@ -36,6 +37,7 @@ import { LocationModule } from './location/location.module';
     FileUploadModule,
     AiModule,
     LookModule,
+    AuthModule,
     WeatherModule,
     LocationModule,
   ],
