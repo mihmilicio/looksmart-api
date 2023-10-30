@@ -9,11 +9,7 @@ import { ClothingItem } from './clothing-items/entities/clothing-item.entity';
 import { FileUploadModule } from './file-upload/file-upload.module';
 import { AiModule } from './ai/ai.module';
 import { LookModule } from './look/look.module';
-import { SupabaseModule } from './supabase/supabase.module';
 import { AuthModule } from './auth/auth.module';
-import { APP_GUARD } from '@nestjs/core';
-import { PassportModule } from '@nestjs/passport';
-import { SupabaseGuard } from './supabase/supabase.guard';
 
 @Module({
   imports: [
@@ -40,17 +36,9 @@ import { SupabaseGuard } from './supabase/supabase.guard';
     AiModule,
     LookModule,
     AuthModule,
-    PassportModule,
-    SupabaseModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    {
-      provide: APP_GUARD,
-      useClass: SupabaseGuard,
-    },
-  ],
+  providers: [AppService],
 })
 export class AppModule {
   constructor(private dataSource: DataSource) {}
