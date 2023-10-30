@@ -11,7 +11,6 @@ import { AiModule } from './ai/ai.module';
 import { LookModule } from './look/look.module';
 import { SupabaseModule } from './supabase/supabase.module';
 import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
 import { APP_GUARD } from '@nestjs/core';
 import { PassportModule } from '@nestjs/passport';
 import { SupabaseGuard } from './supabase/supabase.guard';
@@ -41,7 +40,6 @@ import { SupabaseGuard } from './supabase/supabase.guard';
     AiModule,
     LookModule,
     AuthModule,
-    UsersModule,
     PassportModule,
     SupabaseModule,
   ],
