@@ -31,4 +31,7 @@ export class ClothingItem {
 
   @UpdateDateColumn()
   updatedDate: Date;
+
+  @Column({ nullable: true })
+  userId?: string;
 }

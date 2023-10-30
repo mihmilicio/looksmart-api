@@ -4,6 +4,7 @@ import {
   HttpException,
   HttpStatus,
   Query,
+  Request,
 } from '@nestjs/common';
 import { LookService } from './look.service';
 
@@ -18,12 +19,15 @@ export class LookController {
     @Query('top') top: string,
     @Query('bottom') bottom: string,
     @Query('footwear') footwear: string,
+    @Request() req,
   ) {
     season = season || 'meia-estacao';
     usage = usage || 'casual';
 
     try {
-      const lookAvailability = await this.lookService.checkLookAvailability();
+      const lookAvailability = await this.lookService.checkLookAvailability(
+        req.user.userId,
+      );
 
       if (!lookAvailability.available) {
         throw new HttpException(
@@ -38,6 +42,7 @@ export class LookController {
         top,
         bottom,
         footwear,
+        req.user.userId,
       );
 
       if (look.top == null || look.bottom == null || look.footwear == null) {
@@ -72,9 +77,9 @@ export class LookController {
   }
 
   @Get('availability')
-  async checkLookAvailability() {
+  async checkLookAvailability(@Request() req) {
     try {
-      return this.lookService.checkLookAvailability();
+      return this.lookService.checkLookAvailability(req.user.userId);
     } catch (err) {
       console.log(err);
       throw new HttpException(

@@ -14,27 +14,31 @@ export class LookService {
     topId: string,
     bottomId: string,
     footwearId: string,
+    userId: string,
   ): Promise<LookDto> {
     const promiseTop = !!topId
-      ? this.clothingItemsService.findOne(topId)
+      ? this.clothingItemsService.findOne(topId, userId)
       : this.clothingItemsService.chooseOneInCategory(
           ClothingItemCategoryEnum.Top,
           usage,
           season,
+          userId,
         );
     const promiseBottom = !!bottomId
-      ? this.clothingItemsService.findOne(bottomId)
+      ? this.clothingItemsService.findOne(bottomId, userId)
       : this.clothingItemsService.chooseOneInCategory(
           ClothingItemCategoryEnum.Bottom,
           usage,
           season,
+          userId,
         );
     const promiseFootwear = !!footwearId
-      ? this.clothingItemsService.findOne(footwearId)
+      ? this.clothingItemsService.findOne(footwearId, userId)
       : this.clothingItemsService.chooseOneInCategory(
           ClothingItemCategoryEnum.Footwear,
           usage,
           season,
+          userId,
         );
 
     const pecas = await Promise.all([
@@ -59,15 +63,18 @@ export class LookService {
     };
   }
 
-  async checkLookAvailability(): Promise<LookAvailabilityDto> {
+  async checkLookAvailability(userId: string): Promise<LookAvailabilityDto> {
     const promiseTop = this.clothingItemsService.countItemsOfType(
       ClothingItemCategoryEnum.Top,
+      userId,
     );
     const promiseBottom = this.clothingItemsService.countItemsOfType(
       ClothingItemCategoryEnum.Bottom,
+      userId,
     );
     const promiseFootwear = this.clothingItemsService.countItemsOfType(
       ClothingItemCategoryEnum.Footwear,
+      userId,
     );
 
     const countings = await Promise.all([

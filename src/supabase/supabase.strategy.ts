@@ -6,8 +6,6 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class SupabaseStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(private readonly configService: ConfigService) {
-    console.log(ExtractJwt.fromAuthHeaderAsBearerToken());
-    console.log(configService.get('SUPABASE_JWT_SECRET'));
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -16,7 +14,10 @@ export class SupabaseStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload: any) {
-    console.log(payload);
-    return { userId: payload.sub, user: payload.user };
+    return {
+      userId: payload.sub,
+      email: payload.email,
+      ...payload.user_metadata,
+    };
   }
 }

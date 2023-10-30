@@ -18,7 +18,10 @@ export class ClothingItemsService {
     private readonly aiService: AiService,
   ) {}
 
-  async create(image: Express.Multer.File): Promise<ClothingItem> {
+  async create(
+    image: Express.Multer.File,
+    userId: string,
+  ): Promise<ClothingItem> {
     const id = uuid();
     const ext = image.originalname.split('.').pop();
     const filename = `${id}.${ext}`;
@@ -43,6 +46,7 @@ export class ClothingItemsService {
       id,
       image: process.env.STORAGE_URL + imagePath,
       description: skipAI ? 'Não identificado' : predicted.description,
+      userId,
     });
 
     return {
@@ -54,17 +58,19 @@ export class ClothingItemsService {
       description: saved.description,
       createdDate: saved.createdDate,
       updatedDate: saved.updatedDate,
+      userId,
     };
   }
 
-  findAll(): Promise<ClothingItem[]> {
+  findAll(userId: string): Promise<ClothingItem[]> {
     return this.clothingItemsRepository.find({
       order: { createdDate: 'DESC' },
+      where: { userId },
     });
   }
 
-  findOne(id: string): Promise<ClothingItem | null> {
-    return this.clothingItemsRepository.findOneBy({ id });
+  findOne(id: string, userId: string): Promise<ClothingItem | null> {
+    return this.clothingItemsRepository.findOne({ where: { id, userId } });
   }
 
   async update(
@@ -80,9 +86,9 @@ export class ClothingItemsService {
     return this.clothingItemsRepository.findOneBy({ id });
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: string, userId: string): Promise<void> {
     try {
-      const clothingItem = await this.findOne(id);
+      const clothingItem = await this.findOne(id, userId);
       await this.fileUploadService.deleteFile(clothingItem.image);
     } catch (err) {
       console.log(err);
@@ -96,6 +102,7 @@ export class ClothingItemsService {
     category: ClothingItemCategoryEnum,
     usage: string,
     season: string,
+    userId: string,
   ): Promise<ClothingItem | null> {
     return this.clothingItemsRepository
       .createQueryBuilder('clothing-item')
@@ -113,16 +120,21 @@ export class ClothingItemsService {
           season,
         },
       )
+      .andWhere({ userId })
       .orderBy('RANDOM()')
       .getOne();
   }
 
-  countItemsOfType(category: ClothingItemCategoryEnum): Promise<number> {
+  countItemsOfType(
+    category: ClothingItemCategoryEnum,
+    userId: string,
+  ): Promise<number> {
     return this.clothingItemsRepository
       .createQueryBuilder('clothing-item')
       .select(['clothing-item.id'])
-      .where(`clothing-item.type = :type`, {
+      .where(`clothing-item.type = :type AND clothing-item.userId = :userId`, {
         type: category,
+        userId,
       })
       .getCount();
   }
