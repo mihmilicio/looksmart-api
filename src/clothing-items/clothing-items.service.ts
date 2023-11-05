@@ -46,15 +46,18 @@ export class ClothingItemsService {
       id,
       image: process.env.STORAGE_URL + imagePath,
       description: skipAI ? 'Não identificado' : predicted.description,
+      type: skipAI ? 'cima' : predicted.type,
+      season: skipAI ? 'meia-estacao' : predicted.season,
+      usage: skipAI ? 'casual' : predicted.usage,
       userId,
     });
 
     return {
       id: saved.id,
       image: saved.image,
-      type: skipAI ? 'cima' : predicted.type,
-      season: skipAI ? 'meia-estacao' : predicted.season,
-      usage: skipAI ? 'casual' : predicted.usage,
+      type: saved.type,
+      season: saved.season,
+      usage: saved.usage,
       description: saved.description,
       createdDate: saved.createdDate,
       updatedDate: saved.updatedDate,
