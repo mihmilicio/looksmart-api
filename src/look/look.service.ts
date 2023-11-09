@@ -3,10 +3,19 @@ import { Injectable } from '@nestjs/common';
 import { LookDto } from './dto/look.dto';
 import { ClothingItemCategoryEnum } from 'src/clothing-items/clothing-item-category.enum';
 import { LookAvailabilityDto } from './dto/look-availability.dto';
+import { LookHistory } from './entities/look-history';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { LookHistoryDto } from './dto/look-history.dto';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class LookService {
-  constructor(private readonly clothingItemsService: ClothingItemsService) {}
+  constructor(
+    private readonly clothingItemsService: ClothingItemsService,
+    @InjectRepository(LookHistory)
+    private lookHistoryRepository: Repository<LookHistory>,
+  ) {}
 
   async generate(
     usage: string,
@@ -86,5 +95,39 @@ export class LookService {
     const available = countings.every((count) => count > 0);
 
     return { available };
+  }
+
+  async addToHistory(
+    lookHistoryDto: LookHistoryDto,
+    userId: string,
+  ): Promise<LookHistory> {
+    return this.lookHistoryRepository.save(<LookHistory>{
+      id: uuid(),
+      userId,
+      ...lookHistoryDto,
+    });
+  }
+
+  getHistory(userId: string): Promise<LookHistoryDto[]> {
+    return this.lookHistoryRepository
+      .find({
+        order: { createdDate: 'DESC' },
+        where: { userId },
+      })
+      .then(
+        (result) =>
+          result?.map(
+            (item) =>
+              <LookHistoryDto>{
+                usage: item.usage,
+                season: item.season,
+                topImage: item.topImage,
+                bottomImage: item.bottomImage,
+                footwearImage: item.footwearImage,
+                lowConfiability: item.lowConfiability,
+                createdDate: item.createdDate,
+              },
+          ),
+      );
   }
 }

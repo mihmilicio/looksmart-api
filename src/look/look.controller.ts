@@ -1,12 +1,20 @@
 import {
+  Body,
   Controller,
   Get,
   HttpException,
   HttpStatus,
+  Post,
   Query,
   Request,
 } from '@nestjs/common';
 import { LookService } from './look.service';
+import {
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+} from '@nestjs/swagger';
+import { DefaultExceptionDto } from 'src/exceptions/default-exception.dto';
+import { LookHistoryDto } from './dto/look-history.dto';
 
 @Controller('look')
 export class LookController {
@@ -82,6 +90,44 @@ export class LookController {
       return this.lookService.checkLookAvailability(req.user.userId);
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        'Algo de errado aconteceu. Tente novamente',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('history')
+  @ApiInternalServerErrorResponse({
+    type: DefaultExceptionDto,
+  })
+  getHistory(@Request() req) {
+    try {
+      return this.lookService.getHistory(req.user.userId);
+    } catch (err) {
+      console.error(err);
+      throw new HttpException(
+        'Algo de errado aconteceu. Tente novamente',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Post('history')
+  @ApiNotFoundResponse({
+    type: DefaultExceptionDto,
+  })
+  @ApiInternalServerErrorResponse({
+    type: DefaultExceptionDto,
+  })
+  async addToHistory(@Body() lookHistoryDto: LookHistoryDto, @Request() req) {
+    try {
+      return await this.lookService.addToHistory(
+        lookHistoryDto,
+        req.user.userId,
+      );
+    } catch (err) {
+      console.error(err);
       throw new HttpException(
         'Algo de errado aconteceu. Tente novamente',
         HttpStatus.INTERNAL_SERVER_ERROR,

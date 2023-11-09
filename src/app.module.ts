@@ -14,6 +14,7 @@ import { WeatherModule } from './weather/weather.module';
 import { LocationModule } from './location/location.module';
 import { UserDetailsModule } from './user-details/user-details.module';
 import { UserDetails } from './user-details/entities/user-details.entity';
+import { LookHistory } from './look/entities/look-history';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { UserDetails } from './user-details/entities/user-details.entity';
       username: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: 'looksmart-db',
-      entities: [ClothingItem, UserDetails],
+      entities: [ClothingItem, UserDetails, LookHistory],
       synchronize: true,
       ssl: true,
       logging: true,
