@@ -172,7 +172,7 @@ export class ClothingItemsController {
   async remove(@Param('id') id: string, @Request() req) {
     try {
       if (await this.findOne(id, req)) {
-        return await this.clothingItemsService.remove(id, req.user.userId);
+        return await this.clothingItemsService.remove(id);
       }
     } catch (err) {
       console.error(err);
