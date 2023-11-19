@@ -15,6 +15,7 @@ import { LocationModule } from './location/location.module';
 import { UserDetailsModule } from './user-details/user-details.module';
 import { UserDetails } from './user-details/entities/user-details.entity';
 import { LookHistory } from './look/entities/look-history';
+import { ArticleModule } from './articles/article.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { LookHistory } from './look/entities/look-history';
     WeatherModule,
     LocationModule,
     UserDetailsModule,
+    ArticleModule,
   ],
   controllers: [AppController],
   providers: [AppService],
