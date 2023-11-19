@@ -15,6 +15,7 @@ import {
 } from '@nestjs/swagger';
 import { DefaultExceptionDto } from 'src/exceptions/default-exception.dto';
 import { LookHistoryDto } from './dto/look-history.dto';
+import { LookDto } from './dto/look.dto';
 
 @Controller('look')
 export class LookController {
@@ -44,16 +45,29 @@ export class LookController {
         );
       }
 
-      const look = await this.lookService.generate(
-        usage,
-        season,
-        top,
-        bottom,
-        footwear,
-        req.user.userId,
-      );
+      let look: LookDto;
 
-      if (look.top == null || look.bottom == null || look.footwear == null) {
+      if (process.env.SKIP_AI_SERVICE === 'true') {
+        look = await this.lookService.generateRandom(
+          usage,
+          season,
+          top,
+          bottom,
+          footwear,
+          req.user.userId,
+        );
+      } else {
+        look = await this.lookService.generate(
+          usage,
+          season,
+          top,
+          bottom,
+          footwear,
+          req.user.userId,
+        );
+      }
+
+      if (!look.top?.id || !look.bottom?.id || !look.footwear?.id) {
         throw new HttpException(
           'Não existem peças para formar um look',
           HttpStatus.FAILED_DEPENDENCY,

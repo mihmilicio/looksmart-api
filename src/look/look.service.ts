@@ -8,6 +8,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LookHistoryDto } from './dto/look-history.dto';
 import { v4 as uuid } from 'uuid';
+import { GenerateLookRequestDto } from 'src/ai/dto/generate-look-request.dto';
+import { AiService } from 'src/ai/ai.service';
 
 @Injectable()
 export class LookService {
@@ -15,9 +17,40 @@ export class LookService {
     private readonly clothingItemsService: ClothingItemsService,
     @InjectRepository(LookHistory)
     private lookHistoryRepository: Repository<LookHistory>,
+    private readonly aiService: AiService,
   ) {}
 
   async generate(
+    usage: string,
+    season: string,
+    topId: string,
+    bottomId: string,
+    footwearId: string,
+    userId: string,
+  ): Promise<LookDto> {
+    const closet = await this.clothingItemsService.findAll(userId);
+    const dto = <GenerateLookRequestDto>{
+      closet,
+      season,
+      usage,
+      top: topId,
+      bottom: bottomId,
+      footwear: footwearId,
+    };
+
+    const result = await this.aiService.generateLook(dto);
+
+    return {
+      usage,
+      season,
+      lowConfiability: false, // TODO define
+      top: result.top,
+      bottom: result.bottom,
+      footwear: result.footwear,
+    };
+  }
+
+  async generateRandom(
     usage: string,
     season: string,
     topId: string,
@@ -108,7 +141,7 @@ export class LookService {
     });
   }
 
-  getHistory(userId: string): Promise<LookHistoryDto[]> {
+  async getHistory(userId: string): Promise<LookHistoryDto[]> {
     return this.lookHistoryRepository
       .find({
         order: { createdDate: 'DESC' },
