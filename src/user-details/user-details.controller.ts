@@ -23,6 +23,7 @@ import { DefaultExceptionDto } from 'src/exceptions/default-exception.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UserDetailsService } from './user-details.service';
 import { UserDetailsDto } from './dto/user-details.dto';
+import { FileUploadFailedException } from 'src/exceptions/file-upload-failed.exception';
 
 @Controller('user-details')
 export class UserDetailsController {

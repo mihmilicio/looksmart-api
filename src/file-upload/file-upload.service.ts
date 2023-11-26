@@ -6,6 +6,7 @@ import {
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
+import { FileUploadFailedException } from 'src/exceptions/file-upload-failed.exception';
 
 @Injectable()
 export class FileUploadService {
