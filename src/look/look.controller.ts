@@ -16,6 +16,7 @@ import {
 import { DefaultExceptionDto } from 'src/exceptions/default-exception.dto';
 import { LookHistoryDto } from './dto/look-history.dto';
 import { LookDto } from './dto/look.dto';
+import { AxiosError } from 'axios';
 
 @Controller('look')
 export class LookController {
@@ -87,6 +88,10 @@ export class LookController {
 
       return look;
     } catch (err) {
+      if (err instanceof AxiosError) {
+        throw new HttpException(err.response.data, err.response.status);
+      }
+
       if (err instanceof HttpException) {
         throw err;
       }
@@ -101,7 +106,7 @@ export class LookController {
   @Get('availability')
   async checkLookAvailability(@Request() req) {
     try {
-      return this.lookService.checkLookAvailability(req.user.userId);
+      return await this.lookService.checkLookAvailability(req.user.userId);
     } catch (err) {
       console.log(err);
       throw new HttpException(
@@ -115,9 +120,9 @@ export class LookController {
   @ApiInternalServerErrorResponse({
     type: DefaultExceptionDto,
   })
-  getHistory(@Request() req) {
+  async getHistory(@Request() req) {
     try {
-      return this.lookService.getHistory(req.user.userId);
+      return await this.lookService.getHistory(req.user.userId);
     } catch (err) {
       console.error(err);
       throw new HttpException(

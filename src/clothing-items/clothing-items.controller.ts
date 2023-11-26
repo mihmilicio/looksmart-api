@@ -27,6 +27,7 @@ import {
   ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import { DefaultExceptionDto } from 'src/exceptions/default-exception.dto';
+import { FileUploadFailedException } from 'src/exceptions/file-upload-failed.exception';
 import { AxiosError } from 'axios';
 
 @ApiTags('clothing-items')
@@ -55,9 +56,9 @@ export class ClothingItemsController {
     type: DefaultExceptionDto,
   })
   @UseInterceptors(FileInterceptor('image'))
-  create(@UploadedFile() image: Express.Multer.File, @Request() req) {
+  async create(@UploadedFile() image: Express.Multer.File, @Request() req) {
     try {
-      return this.clothingItemsService.create(image, req.user.userId);
+      return await this.clothingItemsService.create(image, req.user.userId);
     } catch (err) {
       console.error(err);
       if (err instanceof FileUploadFailedException) {
@@ -68,10 +69,7 @@ export class ClothingItemsController {
       }
 
       if (err instanceof AxiosError) {
-        throw new HttpException(
-          'Erro ao classificar a classificar a peça',
-          HttpStatus.SERVICE_UNAVAILABLE,
-        );
+        throw new HttpException(err.response.data, err.response.status);
       }
 
       throw new HttpException(
@@ -85,9 +83,9 @@ export class ClothingItemsController {
   @ApiInternalServerErrorResponse({
     type: DefaultExceptionDto,
   })
-  findAll(@Request() req) {
+  async findAll(@Request() req) {
     try {
-      return this.clothingItemsService.findAll(req.user.userId);
+      return await this.clothingItemsService.findAll(req.user.userId);
     } catch (err) {
       console.error(err);
       throw new HttpException(
