@@ -39,11 +39,10 @@ export class LookService {
     };
 
     const result = await this.aiService.generateLook(dto);
-
     return {
       usage,
       season,
-      lowConfiability: false, // TODO define
+      lowConfiability: result.percentage < 0.5,
       top: result.top,
       bottom: result.bottom,
       footwear: result.footwear,
