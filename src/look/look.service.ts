@@ -42,7 +42,7 @@ export class LookService {
     return {
       usage,
       season,
-      lowConfiability: result.percentage < 0.5,
+      lowConfiability: result.percentage < 0.4,
       top: result.top,
       bottom: result.bottom,
       footwear: result.footwear,
